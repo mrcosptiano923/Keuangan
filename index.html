@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Keuangan"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="theme-color" content="#1f3864"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-180.png"><meta name="mobile-web-app-capable" content="yes">
+<title>Keuangan Periode Gaji</title>
+<style>
+:root{--bg:#f4f6fa;--c:#fff;--t:#1b1f2a;--m:#6b7280;--p:#1f3864;--g:#2e7d32;--o:#c55a11;--v:#6a3d9a;--r:#c62828;--b:#e3e6ec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1420;--c:#1a2132;--t:#e8ebf2;--m:#9aa3b5;--p:#8fb0ff;--g:#6fcf7a;--o:#ffa366;--v:#c4a0f0;--r:#ff7b7b;--b:#2a3347}}
+:root[data-theme="dark"]{--bg:#0f1420;--c:#1a2132;--t:#e8ebf2;--m:#9aa3b5;--p:#8fb0ff;--g:#6fcf7a;--o:#ffa366;--v:#c4a0f0;--r:#ff7b7b;--b:#2a3347}
+*{box-sizing:border-box}
+body{margin:0;font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--t);padding-bottom:84px}
+.w{max-width:560px;margin:auto;padding:14px}
+h1{font-size:19px;margin:4px 0 10px;color:var(--p)}h2{font-size:15px;margin:14px 0 8px;color:var(--p)}
+.card{background:var(--c);border:1px solid var(--b);border-radius:14px;padding:12px;margin-bottom:12px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.k small,label{color:var(--m);font-size:12px;display:block}.k b{font-size:17px}
+.in{color:var(--g)}.ou{color:var(--o)}.sv{color:var(--v)}.neg{color:var(--r)}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;background:var(--b)}
+.Sehat,.Aman,.Sesuai,.Tercapai{background:#c6efce;color:#006100}.Cukup{background:#ffeb9c;color:#7a4a00}.Defisit,.Berat,.Melebihi,.Kurang{background:#ffc7ce;color:#9c0006}
+.row{padding:8px 0;border-top:1px solid var(--b)}.row:first-child{border:0}
+.flex{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.bar{height:7px;background:var(--b);border-radius:9px;overflow:hidden;margin-top:5px}.bar i{display:block;height:100%;background:var(--g)}.bad i{background:var(--r)}.sav i{background:var(--v)}
+input,select,textarea,button{font:inherit;color:var(--t);background:var(--c);border:1px solid var(--b);border-radius:10px;padding:10px;width:100%;margin:3px 0 8px}
+.seg{display:flex;gap:6px}.seg button{margin:0}.seg .on{background:var(--p);color:var(--bg);border-color:var(--p)}
+.main{background:var(--p);color:var(--bg);border:0;font-weight:700}
+.x{width:auto;padding:4px 10px;margin:0;color:var(--r)}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--c);border-top:1px solid var(--b);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{border:0;border-radius:0;margin:0;font-size:12px;padding:10px 0;color:var(--m)}nav .on{color:var(--p);font-weight:700}
+.sc{overflow-x:auto}table{width:100%;border-collapse:collapse;font-size:12.5px}th,td{padding:6px 5px;border-bottom:1px solid var(--b);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}th{color:var(--m)}
+.n{color:var(--m);font-size:12px}
+</style></head><body><div class="w" id="app"></div>
+<nav><button data-v="home" onclick="go('home')">🏠<br>Beranda</button><button data-v="add" onclick="go('add')">➕<br>Catat</button><button data-v="cfg" onclick="go('cfg')">⚖️<br>Alokasi</button><button data-v="rek" onclick="go('rek')">📊<br>Rekap</button></nav>
+<script>
+const P=["Nov (Gaji Okt)","Des (Gaji Nov)","Jan (Gaji Des)","Feb (Gaji Jan)","Mar (Gaji Feb)","Apr (Gaji Mar)","Mei (Gaji Apr)","Jun (Gaji Mei)","Jul (Gaji Jun)","Agu (Gaji Jul)","Sep (Gaji Agu)","Okt (Gaji Sep)"];
+const AK=["BCA","SeaBank","Cash","BRI","Mandiri","GoPay","OVO","DANA","ShopeePay","Kartu Kredit","Lainnya"],IN=["Gaji","Side Job / Freelance","Bonus / THR","Bisnis / Usaha","Lainnya"];
+const fmt=n=>"Rp"+Math.round(n).toLocaleString("id-ID"),$=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const seed=()=>({gaji:5000000,hk:22,fl:0,mt:.15,mp:.85,bo:.3,sp:0,cs:2,
+I:[{n:"Orang Tua",t:"e",v:0},{n:"Pinjaman SPinjam",t:"e",sp:1},{n:"Cicilan Rumah",t:"e",v:0,ci:1},{n:"Wifi",t:"e",v:0},{n:"Baterai Motor",t:"e",v:0},{n:"BPJS",t:"e",v:0},{n:"Listrik",t:"e",v:0},{n:"Amal / Sedekah",t:"e",p:.025},
+{n:"Upgrade Diri",t:"s",v:0,cut:2},{n:"Keinginan",t:"e",v:0,cut:1},{n:"Dana Darurat",t:"s",p:.12,cut:5},{n:"Investasi",t:"s",p:.05,cut:4},{n:"Tujuan Pribadi",t:"s",p:.03,cut:3},{n:"Uang Makan",t:"e",v:30000,mk:1},{n:"Kebutuhan Pokok",t:"e",rest:1}],
+tx:P.map(()=>[])});
+let S=seed(),V="home",pi=0,tp="out",uid=null,db=null;
+const sm=(p,t)=>S.tx[p].filter(x=>x.t==t).reduce((s,x)=>s+x.e,0);
+const real=p=>{const r={};S.tx[p].forEach(x=>{if(x.t!="in")r[x.c]=(r[x.c]||0)+x.e});return r};
+function alloc(p){const g=S.gaji,a={};let base=0,fx=[];
+for(const i of S.I){if(i.rest)continue;
+const d=i.sp?(p>1?0:p==0?Math.round(S.sp/2):S.sp-Math.round(S.sp/2)):i.ci?(p>=S.cs?i.v:0):i.mk?i.v*S.hk:i.p!=null?i.p*g:i.v;
+if(i.cut)fx.push([i,d]);else{a[i.n]=d;base+=d}}
+fx.sort((x,y)=>x[0].cut-y[0].cut);
+let sh=Math.max(base+fx.reduce((s,x)=>s+x[1],0)+S.fl-g,0);
+for(const[i,d]of fx){const c=Math.min(sh,d);a[i.n]=d-c;sh-=c}
+a["Kebutuhan Pokok"]=g-Object.values(a).reduce((s,x)=>s+x,0);return a}
+function stat(p){const m=sm(p,"in"),o=sm(p,"out"),v=sm(p,"sav"),s=m-o-v,rt=m?v/m:0,rp=m?o/m:0;
+const ot=m?(real(p)["Orang Tua"]||0)/m:0;
+return{m,o,v,s,rt,rp,st:!m?"-":s<0?"Defisit":(rt>=S.mt&&rp<=S.mp)?"Sehat":"Cukup",ot,so:!m?"-":ot>S.bo?"Berat":"Aman"}}
+const psel=()=>`<select onchange="pi=+this.value;render()">${P.map((x,i)=>`<option value="${i}"${i==pi?" selected":""}>${x}</option>`).join("")}</select>`;
+const pc=x=>(x*100).toFixed(1)+"%";
+function home(){const a=alloc(pi),r=real(pi),k=stat(pi);
+return `<h1>Keuangan Periode Gaji</h1>${psel()}
+<div class="card g2"><div class="k"><small>Pemasukan</small><b class="in">${fmt(k.m)}</b></div><div class="k"><small>Pengeluaran</small><b class="ou">${fmt(k.o)}</b></div>
+<div class="k"><small>Tabungan & Investasi</small><b class="sv">${fmt(k.v)}</b></div><div class="k"><small>Sisa Akhir Bulan</small><b class="${k.s<0?"neg":""}">${fmt(k.s)}</b></div></div>
+<div class="card flex"><div><small class="n">Status Bulan</small><br><span class="badge ${k.st}">${k.st}</span></div><div><small class="n">Rasio Tabungan</small><br><b>${pc(k.rt)}</b></div><div><small class="n">Rasio Pengeluaran</small><br><b>${pc(k.rp)}</b></div><div><small class="n">Tanggungan Ortu</small><br><span class="badge ${k.so}">${k.so}</span></div></div>
+<h2>Alokasi vs Realisasi</h2><div class="card">${S.I.map(i=>{const al=a[i.n]||0,rl=r[i.n]||0,ov=i.t=="e"&&rl>al+.5,w=al?Math.min(100,rl/al*100):(rl?100:0);
+return `<div class="row"><div class="flex"><span>${i.n}</span><span class="${ov?"neg":""}">${fmt(rl)} / ${fmt(al)}</span></div><div class="bar ${ov?"bad":i.t=="s"?"sav":""}"><i style="width:${w}%"></i></div>${ov?`<div class="n neg">Melebihi ${fmt(rl-al)}</div>`:al>rl?`<div class="n">${i.t=="s"?"Belum disetor":"Sisa jatah"} ${fmt(al-rl)}</div>`:""}</div>`}).join("")}</div>`}
+function add(){const cats=tp=="in"?IN:tp=="sav"?S.I.filter(i=>i.t=="s").map(i=>i.n).concat("Lainnya"):S.I.filter(i=>i.t=="e").map(i=>i.n);
+const L=[...S.tx[pi]].sort((x,y)=>y.d.localeCompare(x.d));
+return `<h1>Catat Transaksi</h1>${psel()}
+<div class="seg">${[["out","Keluar"],["sav","Tabung"],["in","Masuk"]].map(([v,l])=>`<button class="${tp==v?"on":""}" onclick="tp='${v}';render()">${l}</button>`).join("")}</div>
+<div class="card"><label>Tanggal</label><input id="d" type="date" value="${new Date().toISOString().slice(0,10)}">
+<label>${tp=="in"?"Sumber":"Kategori"}</label><select id="c">${cats.map(c=>`<option>${c}</option>`).join("")}</select>
+<label>Deskripsi</label><input id="x" placeholder="mis. Makan siang"><label>Nominal (Rp)</label><input id="e" type="number" inputmode="numeric" placeholder="0">
+<label>Akun</label><select id="a">${AK.map(c=>`<option>${c}</option>`).join("")}</select><button class="main" onclick="addTx()">Simpan</button></div>
+<h2>Transaksi ${P[pi]}</h2><div class="card">${L.length?L.map(x=>`<div class="row flex"><div><b class="${x.t}">${fmt(x.e)}</b> ${esc(x.c)}<div class="n">${x.d} · ${esc(x.x||"")} · ${esc(x.a)}</div></div><button class="x" onclick="del(${x.id})">✕</button></div>`).join(""):'<div class="n">Belum ada transaksi.</div>'}</div>`}
+function addTx(){const e=+$("e").value;if(!(e>0)){$("e").focus();return}
+S.tx[pi].push({id:Date.now(),d:$("d").value,t:tp,c:$("c").value,e,a:$("a").value,x:$("x").value});save();render()}
+function del(id){S.tx[pi]=S.tx[pi].filter(x=>x.id!=id);save();render()}
+function cfg(){const a=alloc(pi);const f=(l,k,q)=>`<label>${l}</label><input type="number" inputmode="decimal" value="${q?+(S[k]*100).toFixed(1):S[k]}" onchange="sg('${k}',+this.value,${q})">`;
+return `<h1>Alokasi Gaji</h1><div class="card">${f("Gaji bulanan (Rp)","gaji")}${f("Hari kerja per bulan (uang makan)","hk")}${f("Batas minimum Kebutuhan Pokok (Rp)","fl")}${f("Sisa hutang SPinjam (Rp, dicicil Nov & Des)","sp")}
+<label>Cicilan rumah mulai periode</label><select onchange="sg('cs',+this.value,0)">${P.map((x,i)=>`<option value="${i}"${i==S.cs?" selected":""}>${x}</option>`).join("")}</select>
+${f("Min. rasio tabungan status Sehat (%)","mt",1)}${f("Maks. rasio pengeluaran status Sehat (%)","mp",1)}${f("Batas tanggungan orang tua (%)","bo",1)}</div>
+<h2>Pos Alokasi</h2>${psel()}<div class="card">${S.I.map((i,n)=>`<div class="row"><div class="flex"><b>${i.n}</b><b>${fmt(a[i.n]||0)}</b></div>${i.rest?'<div class="n">Otomatis: sisa gaji</div>':i.sp?'<div class="n">Mengikuti sisa hutang di atas</div>':`<label>${i.p!=null?"Persen gaji (%)":i.mk?"Maks. per hari (Rp)":"Input (Rp)"}</label><input type="number" inputmode="decimal" value="${i.p!=null?+(i.p*100).toFixed(2):i.v}" onchange="ei(${n},+this.value)">`}</div>`).join("")}
+<div class="n">Jika dana tidak cukup, pos dipotong otomatis: Keinginan, Upgrade Diri, Tujuan Pribadi, Investasi, Dana Darurat.</div></div>
+<h2>Cadangan Data</h2><div class="card"><textarea id="bk" rows="3" placeholder="Tempel cadangan di sini untuk impor"></textarea><div class="seg"><button onclick="$('bk').value=JSON.stringify(S);$('bk').select();try{navigator.clipboard.writeText($('bk').value)}catch(e){}">Ekspor (salin)</button><button onclick="imp()">Impor</button></div><div class="n">Data tersimpan di HP ini saja. Ekspor cadangan secara berkala.</div></div>`}
+function sg(k,v,q){S[k]=q?v/100:v;save();render()}
+function ei(n,v){const i=S.I[n];if(i.p!=null)i.p=v/100;else i.v=v;save();render()}
+function imp(){try{const o=JSON.parse($("bk").value);if(o&&o.I&&o.tx){S=o;save();render()}}catch(e){$("bk").value="Format cadangan tidak valid"}}
+function rek(){const rows=P.map((x,i)=>({x,...stat(i)})),fl=P.map((x,i)=>i).filter(i=>stat(i).m>0);
+const T=k=>rows.reduce((s,r)=>s+r[k],0);
+return `<h1>Rekap Tahunan</h1><div class="card sc"><table><tr><th>Periode</th><th>Masuk</th><th>Keluar</th><th>Tabung</th><th>Sisa</th><th>Status</th></tr>
+${rows.map(r=>`<tr><td>${r.x}</td><td>${fmt(r.m)}</td><td>${fmt(r.o)}</td><td>${fmt(r.v)}</td><td class="${r.s<0?"neg":""}">${fmt(r.s)}</td><td><span class="badge ${r.st}">${r.st}</span></td></tr>`).join("")}
+<tr><th>Total</th><th>${fmt(T("m"))}</th><th>${fmt(T("o"))}</th><th>${fmt(T("v"))}</th><th>${fmt(T("s"))}</th><th></th></tr></table></div>
+<h2>Alokasi vs Realisasi (periode terisi)</h2><div class="card sc"><table><tr><th>Kategori</th><th>Alokasi</th><th>Realisasi</th><th>Status</th></tr>
+${S.I.map(i=>{const al=fl.reduce((s,p)=>s+(alloc(p)[i.n]||0),0),rl=P.reduce((s,x,p)=>s+(real(p)[i.n]||0),0),ok=i.t=="s"?rl>=al-.5:rl<=al+.5,st=!fl.length?"-":i.t=="s"?(ok?"Tercapai":"Kurang"):(ok?"Sesuai":"Melebihi");
+return `<tr><td>${i.n}</td><td>${fmt(al)}</td><td>${fmt(rl)}</td><td><span class="badge ${st}">${st}</span></td></tr>`}).join("")}</table></div>`}
+function go(v){V=v;render();scrollTo(0,0)}
+function render(){$("app").innerHTML=({home,add,cfg,rek})[V]();document.querySelectorAll("nav button").forEach(b=>b.classList.toggle("on",b.dataset.v==V))}
+function save(){try{localStorage.setItem("keu",JSON.stringify(S))}catch(e){}}
+function init(){try{const st=JSON.parse(localStorage.getItem("keu"));if(st&&st.I&&st.tx){S=st;render()}}catch(e){}
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{})}
+render();init();
+</script></body></html>
